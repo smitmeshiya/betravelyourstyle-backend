@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables (secrets!)
+.env
+.env.local
+.env.*.local
+
+# Uploads (user-generated files, not source code)
+uploads/
+
+# Frontend has its own separate git repo — exclude from backend repo
+frontend/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# TypeScript cache
+*.tsbuildinfo

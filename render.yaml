@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: finest-cruise-moments-api
+    runtime: node
+    region: frankfurt          # closest to EU users; change to oregon/ohio if preferred
+    plan: free
+
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # ── Paste your real values in Render dashboard → Environment ──
+      - key: DATABASE_URL
+        sync: false            # set manually in Render dashboard
+
+      - key: JWT_SECRET
+        sync: false
+
+      - key: CORS_ORIGIN
+        sync: false            # set to your Netlify URL e.g. https://finest-cruise.netlify.app
+
+      - key: APP_URL
+        sync: false            # your Render public URL e.g. https://finest-cruise-moments-api.onrender.com
+
+      - key: BASE_URL
+        sync: false            # same as APP_URL
+
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_SECURE
+        sync: false
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false

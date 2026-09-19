@@ -45,5 +45,9 @@ services:
         sync: false
       - key: MAIL_PASS
         sync: false
+      - key: RESEND_API_KEY
+        sync: false            # ⚠ Get from resend.com — required for email on Render (SMTP is blocked)
+
       - key: MAIL_FROM
-        sync: false
+        sync: false            # sender address — must match your Resend verified domain
+                               # for testing without a domain use: onboarding@resend.dev

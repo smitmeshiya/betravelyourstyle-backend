@@ -1,24 +1,7 @@
 import * as nodemailer from 'nodemailer';
-import * as dns from 'dns';
+import { Resend } from 'resend';
 import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
-
-/**
- * Resolve a hostname to its IPv4 address.
- * Render free tier blocks outbound IPv6 — forcing IPv4 DNS lookup
- * prevents nodemailer from connecting to Gmail's IPv6 address.
- */
-async function resolveIPv4(hostname: string): Promise<string> {
-  return new Promise((resolve) => {
-    dns.resolve4(hostname, (err, addresses) => {
-      if (err || !addresses?.length) {
-        resolve(hostname); // fallback to original hostname on error
-      } else {
-        resolve(addresses[0]);
-      }
-    });
-  });
-}
 
 export const sendMail = async (
   to: string,
@@ -38,13 +21,37 @@ export const sendMail = async (
     contentType?: string;
   }[],
 ): Promise<void> => {
-  const smtpHost = smtpConfig?.server || process.env.MAIL_HOST || 'smtp.gmail.com';
 
-  // Resolve to IPv4 explicitly so Node never picks the IPv6 address
-  const resolvedHost = await resolveIPv4(smtpHost);
+  // ── Resend (HTTP API) — used in production on Render ──────────────
+  // Render blocks outbound SMTP (port 587) so we use Resend's HTTPS API.
+  // Set RESEND_API_KEY in Render env vars.
+  if (process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
+    const from = process.env.MAIL_FROM_NAME
+      ? `${process.env.MAIL_FROM_NAME} <${process.env.MAIL_FROM ?? process.env.MAIL_USER}>`
+      : `Finest Cruise Moments <${process.env.MAIL_FROM ?? process.env.MAIL_USER}>`;
+
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      html: htmlTemplateData,
+      ...(text ? { text } : {}),
+    });
+
+    if (error) {
+      console.error('Error sending email (Resend):', error);
+      throw new Error(error.message);
+    }
+
+    console.log('Email sent via Resend to:', to);
+    return;
+  }
+
+  // ── Nodemailer (SMTP) — fallback for local development ────────────
   const transporter = nodemailer.createTransport({
-    host: resolvedHost,
+    host: smtpConfig?.server || process.env.MAIL_HOST || 'smtp.gmail.com',
     port: smtpConfig?.port ? Number(smtpConfig.port) : Number(process.env.MAIL_PORT) || 587,
     secure: process.env.MAIL_SECURE === 'true',
     auth: {

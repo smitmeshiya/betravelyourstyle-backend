@@ -23,10 +23,13 @@ services:
         sync: false            # set to your Netlify URL e.g. https://finest-cruise.netlify.app
 
       - key: APP_URL
-        sync: false            # your Render public URL e.g. https://finest-cruise-moments-api.onrender.com
+        sync: false            # ⚠ SET THIS TO YOUR NETLIFY FRONTEND URL
+                               # e.g. https://finest-cruise-moments-frontend.netlify.app
+                               # This is used in email links (verify email, reset password)
 
       - key: BASE_URL
-        sync: false            # same as APP_URL
+        sync: false            # your Render backend URL e.g. https://finest-cruise-moments-backend.onrender.com
+                               # Used for file upload URL construction (images)
 
       - key: MAIL_HOST
         sync: false

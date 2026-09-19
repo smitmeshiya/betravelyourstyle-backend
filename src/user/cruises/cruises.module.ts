@@ -19,7 +19,6 @@ import { CruiseCabinOffer }         from '../../schema/cruise-cabin-offers.schem
 import { CruisesService }    from './cruises.service';
 import { CruisesController } from './cruises.controller';
 import { AuthGuardService }  from '../../authGuard/jwt.guard';
-import { CabinCategory, CruiseCabinOffer } from 'src/schema';
 
 @Module({
   imports: [
@@ -36,8 +35,6 @@ import { CabinCategory, CruiseCabinOffer } from 'src/schema';
       Review,
       CabinCategory,
       CruiseCabinOffer,
-      CabinCategory,
-      CruiseCabinOffer
     ]),
     JwtModule.registerAsync({
       imports:    [ConfigModule],

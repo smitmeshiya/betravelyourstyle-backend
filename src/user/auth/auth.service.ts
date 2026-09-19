@@ -80,7 +80,7 @@ export class AuthService {
         );
         await this.userRepo.update(existing.id, { email_verification_token: token });
 
-        const verifyUrl = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
+        const verifyUrl = `${process.env.FRONTEND_URL ?? process.env.APP_URL}/auth/verify-email?token=${token}`;
         sendMail(
           existing.email,
           'Your registration – confirm now',
@@ -104,7 +104,7 @@ export class AuthService {
       );
       await this.userRepo.update(user.id, { email_verification_token: token });
 
-      const verifyUrl = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
+      const verifyUrl = `${process.env.FRONTEND_URL ?? process.env.APP_URL}/auth/verify-email?token=${token}`;
       sendMail(
         user.email,
         'Your registration – confirm now',
@@ -144,7 +144,7 @@ export class AuthService {
         email_verification_token: null,
       });
 
-      const loginUrl = `${process.env.APP_URL}/login`;
+      const loginUrl = `${process.env.FRONTEND_URL ?? process.env.APP_URL}`;
       sendMail(
         user.email,
         'Welcome to Finest Cruise Moments!',
@@ -273,7 +273,7 @@ export class AuthService {
         reset_password_expires_at: new Date(Date.now() + 60 * 60 * 1000),
       });
 
-      const resetUrl = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
+      const resetUrl = `${process.env.FRONTEND_URL ?? process.env.APP_URL}/auth/reset-password?token=${token}`;
       sendMail(
         user.email,
         'Reset your password',

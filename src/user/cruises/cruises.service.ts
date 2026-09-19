@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Cruise } from '../../schema/cruises.schema';
-import { CruiseImage } from '../../schema/cruise-images.schema';
-import { Ship } from '../../schema/ships.schema';
-import { ShipImage } from '../../schema/ship-images.schema';
-import { ShippingCompany } from '../../schema/shipping-companies.schema';
-import { CruiseItinerary } from '../../schema/cruise-itinerary.schema';
-import { Port } from '../../schema/ports.schema';
+import { Cruise }                   from '../../schema/cruises.schema';
+import { CruiseImage }              from '../../schema/cruise-images.schema';
+import { Ship }                     from '../../schema/ships.schema';
+import { ShipImage }                from '../../schema/ship-images.schema';
+import { ShippingCompany }          from '../../schema/shipping-companies.schema';
+import { CruiseItinerary }          from '../../schema/cruise-itinerary.schema';
+import { Port }                     from '../../schema/ports.schema';
 import { CruiseService as CruiseSvc } from '../../schema/cruise-services.schema';
-import { CruiseEntryRequirement } from '../../schema/cruise-entry-requirements.schema';
-import { Review } from '../../schema/reviews.schema';
+import { CruiseEntryRequirement }   from '../../schema/cruise-entry-requirements.schema';
+import { Review }                   from '../../schema/reviews.schema';
+import { CabinCategory }            from '../../schema/cabin-categories.schema';
+import { CruiseCabinOffer }         from '../../schema/cruise-cabin-offers.schema';
 import { CommonMessages } from '../../common/common-message';
 import { getPagination, getPagingData } from '../../common/common.utils';
 
@@ -46,6 +48,12 @@ export class CruisesService {
 
     @InjectRepository(Review)
     private readonly reviewRepo: Repository<Review>,
+
+    @InjectRepository(CabinCategory)
+    private readonly cabinCategoryRepo: Repository<CabinCategory>,
+
+    @InjectRepository(CruiseCabinOffer)
+    private readonly cabinOfferRepo: Repository<CruiseCabinOffer>,
   ) {}
 
   // ── Shared helper: make relative paths absolute ──────────
@@ -456,5 +464,80 @@ export class CruisesService {
       limit,
       total_pages: Math.ceil(total / limit),
     };
+  }
+
+  // ── GET /api/cruises/cabins/:slug ─────────────────────────
+  async getCabins(slug: string) {
+    const cruise = await this.cruiseRepo.findOne({
+      where: { slug, status: 'published' },
+      select: ['id', 'currency', 'ship_id'],
+    });
+    if (!cruise) throw new NotFoundException(CommonMessages.not_found('Cruise'));
+
+    const offers = await this.cabinOfferRepo
+      .createQueryBuilder('co')
+      .where('co.cruise_id = :id', { id: cruise.id })
+      .andWhere('co.is_available = true')
+      .andWhere('co.price_per_person IS NOT NULL')
+      .orderBy('co.price_per_person', 'ASC')
+      .getMany();
+
+    if (offers.length === 0) return { categories: [], currency: cruise.currency };
+
+    const categoryIds = [...new Set(offers.map(o => o.cabin_category_id))];
+    const categories  = await this.cabinCategoryRepo
+      .createQueryBuilder('cc')
+      .where('cc.id IN (:...ids)', { ids: categoryIds })
+      .getMany();
+
+    const catMap = new Map(categories.map(c => [c.id, c]));
+
+    type OccEntry = { occupancy_code: string; min_occupancy: number; max_occupancy: number; price_per_person: number };
+    type GroupEntry = { category: CabinCategory; min_price: number; prices_by_occupancy: OccEntry[] };
+    const grouped = new Map<string, GroupEntry>();
+
+    for (const offer of offers) {
+      const cat = catMap.get(offer.cabin_category_id);
+      if (!cat) continue;
+      const price = Number(offer.price_per_person);
+      const occCode = (offer.price_details as any)?.source_category_extended ?? '2V';
+
+      if (!grouped.has(cat.id)) {
+        grouped.set(cat.id, { category: cat, min_price: price, prices_by_occupancy: [] });
+      }
+      const grp = grouped.get(cat.id)!;
+      if (price < grp.min_price) grp.min_price = price;
+
+      const existing = grp.prices_by_occupancy.find(p => p.occupancy_code === occCode);
+      if (!existing) {
+        grp.prices_by_occupancy.push({
+          occupancy_code: occCode,
+          min_occupancy:  offer.min_occupancy,
+          max_occupancy:  offer.max_occupancy ?? offer.min_occupancy,
+          price_per_person: price,
+        });
+      } else if (price < existing.price_per_person) {
+        existing.price_per_person = price;
+      }
+    }
+
+    const OCC_ORDER: Record<string, number> = { '2V': 0, '2T': 1, '3V': 2, '1V': 3 };
+
+    const result = [...grouped.values()]
+      .sort((a, b) => a.min_price - b.min_price)
+      .map(g => ({
+        id:            g.category.id,
+        code:          g.category.code,
+        name:          g.category.name,
+        cabin_type:    g.category.cabin_type,
+        max_occupancy: g.category.max_occupancy,
+        images:        g.category.images as string[],
+        min_price:     g.min_price,
+        prices_by_occupancy: g.prices_by_occupancy.sort(
+          (a, b) => (OCC_ORDER[a.occupancy_code] ?? 99) - (OCC_ORDER[b.occupancy_code] ?? 99),
+        ),
+      }));
+
+    return { categories: result, currency: cruise.currency };
   }
 }

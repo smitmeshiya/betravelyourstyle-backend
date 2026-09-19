@@ -13,10 +13,13 @@ import { Port }                     from '../../schema/ports.schema';
 import { CruiseService as CruiseSvc } from '../../schema/cruise-services.schema';
 import { CruiseEntryRequirement }   from '../../schema/cruise-entry-requirements.schema';
 import { Review }                   from '../../schema/reviews.schema';
+import { CabinCategory }            from '../../schema/cabin-categories.schema';
+import { CruiseCabinOffer }         from '../../schema/cruise-cabin-offers.schema';
 
 import { CruisesService }    from './cruises.service';
 import { CruisesController } from './cruises.controller';
 import { AuthGuardService }  from '../../authGuard/jwt.guard';
+import { CabinCategory, CruiseCabinOffer } from 'src/schema';
 
 @Module({
   imports: [
@@ -31,6 +34,10 @@ import { AuthGuardService }  from '../../authGuard/jwt.guard';
       CruiseSvc,
       CruiseEntryRequirement,
       Review,
+      CabinCategory,
+      CruiseCabinOffer,
+      CabinCategory,
+      CruiseCabinOffer
     ]),
     JwtModule.registerAsync({
       imports:    [ConfigModule],

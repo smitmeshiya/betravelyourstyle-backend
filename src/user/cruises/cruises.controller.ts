@@ -13,19 +13,7 @@ import { CommonMessages } from '../../common/common-message';
 export class CruisesController {
   constructor(private readonly cruisesService: CruisesService) {}
 
-  /**
-   * GET /api/cruises/list
-   * Query params:
-   *   page         (default 1)
-   *   limit        (default 12)
-   *   search       (partial match on name / short_description)
-   *   min_price    (numeric)
-   *   max_price    (numeric)
-   *   duration_days (exact match)
-   *   company_slug  (filter by shipping company)
-   *   sort         (start_date_asc | start_date_desc | price_asc | price_desc |
-   *                  duration_asc | duration_desc)
-   */
+  /** GET /api/cruises/list */
   @Get('/list')
   @HttpCode(HttpStatus.OK)
   async getList(
@@ -55,11 +43,7 @@ export class CruisesController {
     }
   }
 
-  /**
-   * GET /api/cruises/filters/meta
-   * Returns distinct duration values, company list, and price range
-   * — used to populate frontend filter dropdowns.
-   */
+  /** GET /api/cruises/filters/meta */
   @Get('/filters/meta')
   @HttpCode(HttpStatus.OK)
   async getFiltersMeta() {
@@ -71,10 +55,7 @@ export class CruisesController {
     }
   }
 
-  /**
-   * GET /api/cruises/get/:slug
-   * Full detail for a single published cruise.
-   */
+  /** GET /api/cruises/get/:slug */
   @Get('/get/:slug')
   @HttpCode(HttpStatus.OK)
   async getBySlug(@Param('slug') slug: string) {
@@ -86,10 +67,19 @@ export class CruisesController {
     }
   }
 
-  /**
-   * GET /api/cruises/reviews/:slug?page=1&size=10
-   * Reviews summary + paginated list for the ship running this cruise.
-   */
+  /** GET /api/cruises/cabins/:slug */
+  @Get('/cabins/:slug')
+  @HttpCode(HttpStatus.OK)
+  async getCabins(@Param('slug') slug: string) {
+    try {
+      const data = await this.cruisesService.getCabins(slug);
+      return { status: true, message: CommonMessages.GET_DATA('Cabins'), data };
+    } catch (error: any) {
+      return { status: false, message: error.message };
+    }
+  }
+
+  /** GET /api/cruises/reviews/:slug?page=1&size=10 */
   @Get('/reviews/:slug')
   @HttpCode(HttpStatus.OK)
   async getReviews(

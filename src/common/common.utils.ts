@@ -1,6 +1,24 @@
 import * as nodemailer from 'nodemailer';
+import * as dns from 'dns';
 import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
+
+/**
+ * Resolve a hostname to its IPv4 address.
+ * Render free tier blocks outbound IPv6 — forcing IPv4 DNS lookup
+ * prevents nodemailer from connecting to Gmail's IPv6 address.
+ */
+async function resolveIPv4(hostname: string): Promise<string> {
+  return new Promise((resolve) => {
+    dns.resolve4(hostname, (err, addresses) => {
+      if (err || !addresses?.length) {
+        resolve(hostname); // fallback to original hostname on error
+      } else {
+        resolve(addresses[0]);
+      }
+    });
+  });
+}
 
 export const sendMail = async (
   to: string,
@@ -20,8 +38,13 @@ export const sendMail = async (
     contentType?: string;
   }[],
 ): Promise<void> => {
+  const smtpHost = smtpConfig?.server || process.env.MAIL_HOST || 'smtp.gmail.com';
+
+  // Resolve to IPv4 explicitly so Node never picks the IPv6 address
+  const resolvedHost = await resolveIPv4(smtpHost);
+
   const transporter = nodemailer.createTransport({
-    host: smtpConfig?.server || process.env.MAIL_HOST || 'smtp.gmail.com',
+    host: resolvedHost,
     port: smtpConfig?.port ? Number(smtpConfig.port) : Number(process.env.MAIL_PORT) || 587,
     secure: process.env.MAIL_SECURE === 'true',
     auth: {
@@ -29,9 +52,7 @@ export const sendMail = async (
       pass: smtpConfig?.pass || process.env.MAIL_PASS,
     },
     tls: { rejectUnauthorized: false },
-    // Force IPv4 — Render free tier does not support outbound IPv6
-    family: 4,
-  } as any);
+  });
 
   const mailOptions: nodemailer.SendMailOptions = {
     from: `"Finest Cruise Moments" <${smtpConfig?.user || process.env.MAIL_FROM || process.env.MAIL_USER}>`,

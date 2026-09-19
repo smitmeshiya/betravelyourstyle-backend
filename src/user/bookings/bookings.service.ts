@@ -27,6 +27,7 @@ export interface CreateBookingDto {
   customer_message?: string | null;
   number_of_adults:   number;
   number_of_children: number;
+  selected_price_per_person?: number | null;
   passengers:      PassengerDto[];
 }
 
@@ -89,9 +90,15 @@ export class BookingsService {
       destination_port = p?.name ?? null;
     }
 
-    // 3. Calculate total
+    // 3. Calculate total — use the cabin price the user selected,
+    //    falling back to the cruise's base price_per_person
     const totalPax    = dto.number_of_adults + dto.number_of_children;
-    const pricePerPax = cruise.price_per_person ? Number(cruise.price_per_person) : null;
+    const pricePerPax =
+      dto.selected_price_per_person != null
+        ? Number(dto.selected_price_per_person)
+        : cruise.price_per_person
+          ? Number(cruise.price_per_person)
+          : null;
     const totalAmount = pricePerPax !== null ? pricePerPax * totalPax : null;
 
     // 4. Generate unique inquiry number (retry on collision)

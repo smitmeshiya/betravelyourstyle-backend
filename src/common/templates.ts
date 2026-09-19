@@ -1,5 +1,5 @@
-// =========================================================
-// All HTML email templates for Finest Cruise Moments
+﻿// =========================================================
+// All HTML email templates for Be Travel Your Style
 // Each function accepts dynamic values and returns an HTML string
 // =========================================================
 
@@ -9,7 +9,7 @@ const baseLayout = (content: string): string => `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Finest Cruise Moments</title>
+  <title>Be Travel Your Style</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
@@ -20,10 +20,10 @@ const baseLayout = (content: string): string => `
           <tr>
             <td align="center" style="padding:32px 24px 24px;border-bottom:1px solid #e0e0e0;">
               <h1 style="margin:0;font-family:Georgia,serif;font-size:14px;letter-spacing:4px;text-transform:uppercase;color:#555;">
-                FINEST CRUISE
+                BE TRAVEL
               </h1>
               <h2 style="margin:4px 0 0;font-family:Georgia,serif;font-size:32px;letter-spacing:2px;color:#1a1a1a;">
-                MOMENTS
+                YOUR STYLE
               </h2>
             </td>
           </tr>
@@ -37,7 +37,7 @@ const baseLayout = (content: string): string => `
           <tr>
             <td align="center" style="padding:24px;background:#f9f9f9;border-top:1px solid #e0e0e0;">
               <p style="margin:0;font-size:12px;color:#999;">
-                © ${new Date().getFullYear()} Finest Cruise Moments. All rights reserved.
+                © ${new Date().getFullYear()} Be Travel Your Style. All rights reserved.
               </p>
               <p style="margin:6px 0 0;font-size:12px;color:#999;">
                 If you did not request this email, please ignore it.
@@ -79,7 +79,7 @@ export const emailVerificationTemplate = (
       Hello <strong>${firstname}</strong>,
     </p>
     <p style="margin:0 0 12px;font-size:15px;color:#444;line-height:1.6;">
-      Thank you for registering with Finest Cruise Moments. To complete your
+      Thank you for registering with Be Travel Your Style. To complete your
       registration and activate your account, please click the button below:
     </p>
     ${ctaButton(verifyUrl, 'Confirm registration')}
@@ -88,7 +88,7 @@ export const emailVerificationTemplate = (
       to register again.
     </p>
     <p style="margin:16px 0 0;font-size:14px;color:#444;">
-      Kind regards,<br/>Your Finest Cruise Moments Team
+      Kind regards,<br/>Your Be Travel Your Style Team
     </p>
   `);
 
@@ -114,7 +114,7 @@ export const passwordResetTemplate = (
       Your password will not change.
     </p>
     <p style="margin:16px 0 0;font-size:14px;color:#444;">
-      Kind regards,<br/>Your Finest Cruise Moments Team
+      Kind regards,<br/>Your Be Travel Your Style Team
     </p>
   `);
 
@@ -136,7 +136,7 @@ export const welcomeTemplate = (
     </p>
     ${ctaButton(loginUrl, 'Log in to your account')}
     <p style="margin:16px 0 0;font-size:14px;color:#444;">
-      Kind regards,<br/>Your Finest Cruise Moments Team
+      Kind regards,<br/>Your Be Travel Your Style Team
     </p>
   `);
 
@@ -150,17 +150,17 @@ export const passwordChangedTemplate = (firstname: string): string =>
       Hello <strong>${firstname}</strong>,
     </p>
     <p style="margin:0 0 12px;font-size:15px;color:#444;line-height:1.6;">
-      This is a confirmation that the password for your Finest Cruise Moments
+      This is a confirmation that the password for your Be Travel Your Style
       account was successfully changed.
     </p>
     <p style="margin:0 0 12px;font-size:15px;color:#444;line-height:1.6;">
       If you did not make this change, please contact us immediately at
-      <a href="mailto:beratung@finestcruisemoments.de" style="color:#1a1a1a;">
-        beratung@finestcruisemoments.de
+      <a href="mailto:beratung@betravelyourstyle.de" style="color:#1a1a1a;">
+        beratung@betravelyourstyle.de
       </a>.
     </p>
     <p style="margin:16px 0 0;font-size:14px;color:#444;">
-      Kind regards,<br/>Your Finest Cruise Moments Team
+      Kind regards,<br/>Your Be Travel Your Style Team
     </p>
   `);
 
@@ -362,7 +362,7 @@ export const bookingConfirmationTemplate = (data: {
       Please always quote your reference number: <strong>${data.inquiry_number}</strong>
     </p>
     <p style="margin:16px 0 0;font-size:14px;color:#444;">
-      Sincerely,<br/><strong>Your Finest Cruise Moments Team</strong>
+      Sincerely,<br/><strong>Your Be Travel Your Style Team</strong>
     </p>
   `);
 };

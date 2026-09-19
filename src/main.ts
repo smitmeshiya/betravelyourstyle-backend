@@ -8,9 +8,9 @@ async function bootstrap() {
 
   // Enable CORS.
   // Production: set CORS_ORIGIN in Render env vars to your Netlify URL
-  //   e.g.  CORS_ORIGIN=https://finest-cruise.netlify.app
+  //   e.g.  CORS_ORIGIN=https://betravelyourstyle-frontend.netlify.app
   // Multiple origins are comma-separated:
-  //   e.g.  CORS_ORIGIN=https://finest-cruise.netlify.app,https://www.finest-cruise.com
+  //   e.g.  CORS_ORIGIN=https://betravelyourstyle-frontend.netlify.app,https://www.betravelyourstyle.com
   // Development fallback: Vite dev server on localhost:5173
   app.enableCors({
     origin: process.env.CORS_ORIGIN

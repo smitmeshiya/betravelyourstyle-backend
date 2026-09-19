@@ -1,4 +1,4 @@
-import * as nodemailer from 'nodemailer';
+﻿import * as nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
@@ -30,7 +30,7 @@ export const sendMail = async (
 
     const from = process.env.MAIL_FROM_NAME
       ? `${process.env.MAIL_FROM_NAME} <${process.env.MAIL_FROM ?? process.env.MAIL_USER}>`
-      : `Finest Cruise Moments <${process.env.MAIL_FROM ?? process.env.MAIL_USER}>`;
+      : `Be Travel Your Style <${process.env.MAIL_FROM ?? process.env.MAIL_USER}>`;
 
     const { error } = await resend.emails.send({
       from,
@@ -62,7 +62,7 @@ export const sendMail = async (
   });
 
   const mailOptions: nodemailer.SendMailOptions = {
-    from: `"Finest Cruise Moments" <${smtpConfig?.user || process.env.MAIL_FROM || process.env.MAIL_USER}>`,
+    from: `"Be Travel Your Style" <${smtpConfig?.user || process.env.MAIL_FROM || process.env.MAIL_USER}>`,
     to,
     subject,
     text: text ?? undefined,

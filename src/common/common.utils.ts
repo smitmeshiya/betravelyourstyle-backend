@@ -29,7 +29,9 @@ export const sendMail = async (
       pass: smtpConfig?.pass || process.env.MAIL_PASS,
     },
     tls: { rejectUnauthorized: false },
-  });
+    // Force IPv4 — Render free tier does not support outbound IPv6
+    family: 4,
+  } as any);
 
   const mailOptions: nodemailer.SendMailOptions = {
     from: `"Finest Cruise Moments" <${smtpConfig?.user || process.env.MAIL_FROM || process.env.MAIL_USER}>`,

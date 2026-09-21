@@ -20,6 +20,9 @@ export class Port {
   @Column({ type: 'char', length: 2, nullable: true })
   country_code: string | null;
 
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  port_code: string | null;
+
   @Column({ type: 'numeric', precision: 10, scale: 7, nullable: true })
   latitude: number | null;
 

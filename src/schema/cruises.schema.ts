@@ -69,6 +69,9 @@ export class Cruise {
   @Column({ type: 'jsonb', default: '[]' })
   highlights: any[];
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  region: string | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 

@@ -39,4 +39,16 @@ export class CruiseItinerary {
 
   @Column({ type: 'numeric', precision: 10, scale: 7, nullable: true })
   longitude: number | null;
+
+  @Column({ type: 'text', nullable: true })
+  remark: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  is_changeover: boolean;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  port_code: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  region: string | null;
 }

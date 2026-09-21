@@ -29,7 +29,7 @@ import { FavoritesModule } from './user/favorites/favorites.module';
         configService.get('database'),
     }),
 
-    GuardModule, // global — AuthGuardService, UserGuard, AdminGuard available everywhere
+    GuardModule,
     AuthModule,
     CommonapiModule,
     RecommendationsModule,

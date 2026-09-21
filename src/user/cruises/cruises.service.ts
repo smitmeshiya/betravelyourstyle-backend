@@ -167,6 +167,7 @@ export class CruisesService {
         company_logo:    this.toAbsolute(company?.logo ?? null),
         company_slug:    company?.slug ?? null,
         itinerary_ports: itineraryByCruise.get(c.id) ?? [],
+        region:          c.region ?? null,
       };
     });
   }
@@ -182,6 +183,7 @@ export class CruisesService {
     max_price?: number;
     duration_days?: number;
     company_slug?: string;
+    region?: string;
     sort?: string;
   }) {
     const {
@@ -192,6 +194,7 @@ export class CruisesService {
       max_price,
       duration_days,
       company_slug,
+      region,
       sort = 'start_date_asc',
     } = filters;
 
@@ -231,6 +234,11 @@ export class CruisesService {
           'sc.id = c.shipping_company_id AND sc.slug = :company_slug',
           { company_slug },
         );
+    }
+
+    // filter by region
+    if (region) {
+      qb = qb.andWhere('c.region = :region', { region });
     }
 
     // --- sorting ---
@@ -322,12 +330,16 @@ export class CruisesService {
         port_name:         port?.name ?? null,
         country:           port?.country ?? null,
         country_code:      port?.country_code ?? null,
+        port_code:         row.port_code ?? null,
         latitude:          row.latitude ?? port?.latitude ?? null,
         longitude:         row.longitude ?? port?.longitude ?? null,
         arrival_at:        row.arrival_at,
         departure_at:      row.departure_at,
         stay_description:  row.stay_description,
         route_description: row.route_description,
+        remark:            row.remark,
+        is_changeover:     row.is_changeover,
+        region:            row.region,
       };
     });
 
@@ -342,7 +354,7 @@ export class CruisesService {
   // ── GET /api/cruises/filters/meta ─────────────────────────
   // Returns distinct values for populating filter dropdowns
   async getFiltersMeta() {
-    const [durationRows, companies] = await Promise.all([
+    const [durationRows, companies, regionRows] = await Promise.all([
       this.cruiseRepo
         .createQueryBuilder('c')
         .select('DISTINCT c.duration_days', 'duration_days')
@@ -355,6 +367,14 @@ export class CruisesService {
         select: ['id', 'name', 'slug', 'logo'],
         order: { name: 'ASC' },
       }),
+
+      this.cruiseRepo
+        .createQueryBuilder('c')
+        .select('DISTINCT c.region', 'region')
+        .where("c.status = 'published'")
+        .andWhere('c.region IS NOT NULL')
+        .orderBy('c.region', 'ASC')
+        .getRawMany<{ region: string }>(),
     ]);
 
     const priceRow = await this.cruiseRepo
@@ -372,6 +392,7 @@ export class CruisesService {
         name: co.name,
         logo: this.toAbsolute(co.logo),
       })),
+      regions: regionRows.map((r) => r.region),
       price_range: {
         min: priceRow?.min_price ? Number(priceRow.min_price) : 0,
         max: priceRow?.max_price ? Number(priceRow.max_price) : 0,
@@ -525,18 +546,25 @@ export class CruisesService {
 
     const result = [...grouped.values()]
       .sort((a, b) => a.min_price - b.min_price)
-      .map(g => ({
-        id:            g.category.id,
-        code:          g.category.code,
-        name:          g.category.name,
-        cabin_type:    g.category.cabin_type,
-        max_occupancy: g.category.max_occupancy,
-        images:        g.category.images as string[],
-        min_price:     g.min_price,
-        prices_by_occupancy: g.prices_by_occupancy.sort(
-          (a, b) => (OCC_ORDER[a.occupancy_code] ?? 99) - (OCC_ORDER[b.occupancy_code] ?? 99),
-        ),
-      }));
+      .map(g => {
+        // Get availability info from the first offer in this group
+        const firstOffer = offers.find(o => o.cabin_category_id === g.category.id);
+        
+        return {
+          id:            g.category.id,
+          code:          g.category.code,
+          name:          g.category.name,
+          cabin_type:    g.category.cabin_type,
+          max_occupancy: g.category.max_occupancy,
+          images:        g.category.images as string[],
+          min_price:     g.min_price,
+          available_quantity: firstOffer?.available_quantity ?? null,
+          total_quantity:     firstOffer?.total_quantity ?? null,
+          prices_by_occupancy: g.prices_by_occupancy.sort(
+            (a, b) => (OCC_ORDER[a.occupancy_code] ?? 99) - (OCC_ORDER[b.occupancy_code] ?? 99),
+          ),
+        };
+      });
 
     return { categories: result, currency: cruise.currency };
   }

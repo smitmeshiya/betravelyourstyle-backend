@@ -13,27 +13,6 @@ import { CommonMessages } from '../../common/common-message';
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
-  /**
-   * POST /api/bookings/create
-   *
-   * Body:
-   * {
-   *   cruise_id:         string (uuid)
-   *   customer_name:     string
-   *   customer_email:    string
-   *   customer_phone:    string | null
-   *   customer_message:  string | null
-   *   number_of_adults:  number
-   *   number_of_children: number
-   *   passengers: [{
-   *     firstname:   string
-   *     lastname:    string
-   *     birth_date:  string | null   (ISO date "YYYY-MM-DD")
-   *     nationality: string | null
-   *     gender:      "male" | "female" | "other" | null
-   *   }]
-   * }
-   */
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() body: CreateBookingDto) {

@@ -24,6 +24,7 @@ export class CruisesController {
     @Query('max_price')     max_price     = '',
     @Query('duration_days') duration_days = '',
     @Query('company_slug')  company_slug  = '',
+    @Query('region')        region        = '',
     @Query('sort')          sort          = 'start_date_asc',
   ) {
     try {
@@ -35,6 +36,7 @@ export class CruisesController {
         max_price:     max_price ? parseFloat(max_price) : undefined,
         duration_days: duration_days ? parseInt(duration_days) : undefined,
         company_slug:  company_slug || undefined,
+        region:        region || undefined,
         sort,
       });
       return { status: true, message: CommonMessages.GET_LIST('Cruises'), data };

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
@@ -147,7 +147,7 @@ export class AuthService {
       const loginUrl = `${process.env.FRONTEND_URL ?? process.env.APP_URL}`;
       sendMail(
         user.email,
-        'Welcome to Finest Cruise Moments!',
+        'Welcome to Be Travel Your Style!',
         welcomeTemplate(user.firstname ?? 'there', loginUrl),
       ).catch((err) => console.error('Background mail error (welcome):', err));
 

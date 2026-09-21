@@ -40,6 +40,12 @@ export class CruiseCabinOffer {
   @Column({ type: 'boolean', default: true })
   is_available: boolean;
 
+  @Column({ type: 'int', nullable: true })
+  available_quantity: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  total_quantity: number | null;
+
   @Column({ type: 'jsonb', default: '{}' })
   price_details: Record<string, any>;
 }

@@ -1,0 +1,27 @@
+name: Keep Render Server Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping Render Backend
+        run: |
+          echo "Pinging Render backend to keep it alive..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://betravelyourstyle-backend.onrender.com/health)
+          echo "Response code: $response"
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ Server is alive and responding!"
+          else
+            echo "⚠️  Server returned status code: $response"
+          fi
+          
+      - name: Log Timestamp
+        run: echo "Keep-alive ping completed at $(date)"

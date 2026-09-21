@@ -14,13 +14,21 @@ jobs:
       - name: Ping Render Backend
         run: |
           echo "Pinging Render backend to keep it alive..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://finest-cruise-moments-backend.onrender.com/health)
-          echo "Response code: $response"
+          echo "URL: https://finest-cruise-moments-backend.onrender.com/health"
           
-          if [ $response -eq 200 ]; then
+          # Make the request and capture both response code and body
+          response=$(curl -s -w "\n%{http_code}" https://finest-cruise-moments-backend.onrender.com/health)
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+          
+          echo "Response code: $http_code"
+          echo "Response body: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
             echo "✅ Server is alive and responding!"
           else
-            echo "⚠️  Server returned status code: $response"
+            echo "⚠️  Server returned status code: $http_code"
+            exit 1
           fi
           
       - name: Log Timestamp

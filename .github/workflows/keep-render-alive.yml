@@ -14,7 +14,7 @@ jobs:
       - name: Ping Render Backend
         run: |
           echo "Pinging Render backend to keep it alive..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://betravelyourstyle-backend.onrender.com/health)
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://finest-cruise-moments-backend.onrender.com/health)
           echo "Response code: $response"
           
           if [ $response -eq 200 ]; then
